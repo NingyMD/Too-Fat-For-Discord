@@ -25,6 +25,17 @@
             margin-bottom: 10px;
         }
 
+        server-status div {
+            display: block;
+            position: absolute;
+            background-color: rgb(56, 60, 71);
+            border: 1px rgba(0, 0, 0, 0.25) solid;
+            border-radius: 10px;
+            padding: 5px;
+            transform: translate(-16px, -16px);
+            cursor: pointer;
+        }
+
         .title-1.p {
             font-weight: bold;
             font-size: 25px;
@@ -79,26 +90,31 @@
                     const serverIP = element.getAttribute('ip');
                     const ipLink = element.getAttribute('ipLink');
                     if (!serverIP) return;
-                    element.innerHTML = `<p>IP: <a href="${ipLink}">${serverIP}</a></p><p>Loading...</p>`;
+                    element.innerHTML = `
+                    <div class="discord" data-dest="${ipLink}">Discord Invite</div>
+                    <p>IP: <a>${serverIP}</a></p><p>Loading...</p>
+                    `;
                     try {
                         const response = await fetch(`https://api.mcsrvstat.us/3/${serverIP}`);
                         const data = await response.json();
 
                         if (data.online) {
                             element.innerHTML = `
-                        <p class="title-1">IP: <a href="${ipLink}">${serverIP}</a></p>
+                        <div class="discord" data-dest="${ipLink}">Discord Invite</div>
+                        <p class="title-1">IP: <a>${serverIP}</a></p>
                         <p class="title-1 p">Status: <a>Online</a></p>
                         <p class="title-1 p">Players: <a>${data.players.online} / ${data.players.max}</a></p>
                         <p class="title-1 p">MOTD: <a>${data.motd.clean.join(' ')}</a></p>
                     `;
                         } else {
                             element.innerHTML = `
-                        <p class="title-1">IP: <a href="${ipLink}">${serverIP}</a></p>
+                        <div class="discord" data-dest="${ipLink}">Discord Invite</div>
+                        <p class="title-1">IP: <a>${serverIP}</a></p>
                         <p class="title-1 p">Status: <a>Offline</a></p>
                     `;
                         }
                     } catch (error) {
-                        element.innerHTML = `<p>Error loading <a href="${ipLink}">${serverIP}</a></p>`;
+                        element.innerHTML = `<p>Error loading <a>${serverIP}</a></p>`;
                         console.error(error);
                     }
                 });
@@ -106,6 +122,16 @@
             getServerStatus();
             document.getElementById("refresh").addEventListener("click", function () {
                 getServerStatus();
+            });
+            document.addEventListener("click", function (event) {
+                const button = event.target.closest(".discord");
+
+                if (button) {
+                    const url = button.getAttribute("data-dest");
+                    if (url) {
+                        window.open(url, "_blank");
+                    }
+                }
             });
         </script>
 
