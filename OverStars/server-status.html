@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Server Status</title>
+</head>
+
+<body>
+    <style>
+        body {
+            background-color: rgb(62, 66, 75);
+            color: white;
+        }
+
+        server-status {
+            background-color: rgba(0, 0, 0, 0.25);
+            border: 1px rgba(0, 0, 0, 0.25) solid;
+            border-radius: 10px;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 25% 25% 25% 25%;
+        }
+
+        .title-1 {
+            font-weight: bold;
+            font-size: 25px;
+            color: rgb(172, 172, 172);
+        }
+
+        .title-1 a {
+            font-weight: normal;
+            font-size: 20px;
+            color: rgb(231, 231, 231)
+        }
+    </style>
+    <main>
+        <h1 style="justify-self: center;">Minecraft Server Status</h1>
+        <server-status ip="143.20.122.13:25567"></server-status>
+        <server-status ip="openstars.scrim.club"></server-status>
+
+<script>
+    async function getServerStatus() {
+        const serverElements = document.querySelectorAll('server-status');
+                serverElements.forEach(async (element) => {
+            const serverIP = element.getAttribute('ip');
+            if (!serverIP) return;
+            element.innerHTML = `<p>IP: ${serverIP}</p><p>Loading...</p>`;
+            try {
+                const response = await fetch(`https://api.mcsrvstat.us/3/${serverIP}`);
+                const data = await response.json();
+
+                if (data.online) {
+                    element.innerHTML = `
+                        <p class="title-1">IP: <a>${serverIP}</a></p>
+                        <p class="title-1">Status: <a>Online</a></p>
+                        <p class="title-1">Players: <a>${data.players.online} / ${data.players.max}</a></p>
+                        <p class="title-1">MOTD: <a>${data.motd.clean.join(' ')}</a></p>
+                    `;
+                } else {
+                    element.innerHTML = `
+                        <p class="title-1">IP: <a>${serverIP}</a></p>
+                        <p class="title-1">Status: <a>Offline</a></p>
+                    `;
+                }
+            } catch (error) {
+                element.innerHTML = `<p>Error loading ${serverIP}</p>`;
+                console.error(error);
+            }
+        });
+    }
+    getServerStatus();
+</script>
+
+    </main>
+</body>
+
+</html>
